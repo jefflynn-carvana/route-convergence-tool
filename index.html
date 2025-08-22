@@ -6,279 +6,87 @@
     <title>Route Convergence Tool</title>
     <meta name="description" content="Determine if two driving routes will converge at the same time with timezone-aware calculations">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #2596be 0%, #1e7ba8 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
+            min-height: 100vh; padding: 20px; color: #333;
         }
-
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            max-width: 1200px; margin: 0 auto; background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); overflow: hidden;
         }
-
         .header {
             background: linear-gradient(135deg, #2596be 0%, #1e7ba8 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+            color: white; padding: 30px; text-align: center;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .content { padding: 40px; }
         .share-info {
-            background: #e3f2fd;
-            border: 1px solid #2196f3;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 30px;
-            text-align: center;
+            background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px;
+            padding: 15px; margin-bottom: 30px; text-align: center;
         }
-
-        .share-info h3 {
-            color: #1976d2;
-            margin-bottom: 10px;
-        }
-
+        .share-info h3 { color: #1976d2; margin-bottom: 10px; }
         .share-url {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            font-family: monospace;
-            word-break: break-all;
-            margin: 10px 0;
-            cursor: pointer;
+            background: white; border: 1px solid #ddd; border-radius: 4px; padding: 10px;
+            font-family: monospace; word-break: break-all; margin: 10px 0; cursor: pointer;
         }
-
-        .share-url:hover {
-            background: #f5f5f5;
-        }
-
-        .routes-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
+        .routes-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
         .route-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 30px;
-            border: 2px solid #e9ecef;
+            background: #f8f9fa; border-radius: 12px; padding: 30px; border: 2px solid #e9ecef;
             transition: all 0.3s ease;
         }
-
-        .route-section:hover {
-            border-color: #2596be;
-            box-shadow: 0 8px 25px rgba(37, 150, 190, 0.15);
-        }
-
+        .route-section:hover { border-color: #2596be; box-shadow: 0 8px 25px rgba(37, 150, 190, 0.15); }
         .route-section h2 {
-            color: #2596be;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #2596be;
-            padding-bottom: 10px;
+            color: #2596be; margin-bottom: 25px; font-size: 1.5em;
+            border-bottom: 2px solid #2596be; padding-bottom: 10px;
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.95em;
-        }
-
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.95em; }
         input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: white;
+            width: 100%; padding: 12px 15px; border: 2px solid #dee2e6; border-radius: 8px;
+            font-size: 16px; transition: all 0.3s ease; background: white;
         }
-
         input:focus, select:focus {
-            outline: none;
-            border-color: #2596be;
-            box-shadow: 0 0 0 3px rgba(37, 150, 190, 0.1);
+            outline: none; border-color: #2596be; box-shadow: 0 0 0 3px rgba(37, 150, 190, 0.1);
         }
-
-        .timezone-display {
-            background: #e8f5e8;
-            border: 2px solid #4caf50;
-            color: #2e7d32;
-            font-weight: 600;
-        }
-
-        .controls {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
+        .controls { text-align: center; margin-bottom: 40px; }
         .btn {
-            background: linear-gradient(135deg, #2596be 0%, #1e7ba8 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background: linear-gradient(135deg, #2596be 0%, #1e7ba8 100%); color: white; border: none;
+            padding: 15px 40px; font-size: 1.1em; border-radius: 8px; cursor: pointer;
+            transition: all 0.3s ease; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 150, 190, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 150, 190, 0.3); }
         .result {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: 600;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.5s ease;
-            opacity: 0;
-            transform: translateY(20px);
+            margin-top: 30px; padding: 25px; border-radius: 12px; text-align: center;
+            font-size: 1.2em; font-weight: 600; min-height: 80px; display: flex;
+            align-items: center; justify-content: center; transition: all 0.5s ease;
+            opacity: 0; transform: translateY(20px);
         }
-
-        .result.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .result.success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: 3px solid #1e7e34;
-        }
-
-        .result.error {
-            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
-            color: white;
-            border: 3px solid #c82333;
-        }
-
+        .result.show { opacity: 1; transform: translateY(0); }
+        .result.success { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: 3px solid #1e7e34; }
+        .result.error { background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%); color: white; border: 3px solid #c82333; }
         .details {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #2596be;
+            margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2596be;
         }
-
-        .details h3 {
-            color: #2596be;
-            margin-bottom: 15px;
-        }
-
-        .details p {
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #dee2e6;
-            color: #6c757d;
-        }
-
+        .details h3 { color: #2596be; margin-bottom: 15px; }
+        .details p { margin-bottom: 8px; line-height: 1.6; }
+        .footer { text-align: center; padding: 20px; background: #f8f9fa; border-top: 1px solid #dee2e6; color: #6c757d; }
         .copy-btn {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
+            background: #2196f3; color: white; border: none; padding: 5px 10px;
+            border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px;
         }
-
-        .copy-btn:hover {
-            background: #1976d2;
-        }
-
-        @media (max-width: 768px) {
-            .routes-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-
+        .loading { display: none; text-align: center; margin: 20px 0; }
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2596be;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            border: 4px solid #f3f3f3; border-top: 4px solid #2596be; border-radius: 50%;
+            width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .routes-container { grid-template-columns: 1fr; gap: 20px; }
+            .content { padding: 20px; }
+            .header h1 { font-size: 2em; }
         }
     </style>
 </head>
@@ -293,10 +101,7 @@
             <div class="share-info">
                 <h3>📤 Shareable Tool</h3>
                 <p>This tool can be shared with anyone using the URL below:</p>
-                <div class="share-url" id="shareUrl" onclick="copyToClipboard()">
-                    Loading URL...
-                    <button class="copy-btn" onclick="copyToClipboard(event)">Copy</button>
-                </div>
+                <div class="share-url" id="shareUrl" onclick="copyToClipboard()">Loading URL...</div>
                 <p><small>Click to copy the link and share with others</small></p>
             </div>
 
@@ -305,23 +110,23 @@
                     <h2>Route 1</h2>
                     <div class="form-group">
                         <label for="location1">Origin Location Code:</label>
-                        <input type="text" id="location1" placeholder="e.g., NYC, 10001, New York" oninput="updateTimezone(1)">
+                        <input type="text" id="location1" placeholder="e.g., NYC, 10001, New York">
                     </div>
                     <div class="form-group">
                         <label for="address1">Origin Address:</label>
                         <input type="text" id="address1" placeholder="Starting address">
                     </div>
                     <div class="form-group">
-                        <label for="timezone1">Detected Timezone:</label>
-                        <input type="text" id="timezone1" placeholder="Enter location code above" readonly class="timezone-display">
+                        <label for="destLocation1">Destination Location Code:</label>
+                        <input type="text" id="destLocation1" placeholder="e.g., LAX, 90210, Los Angeles">
                     </div>
                     <div class="form-group">
                         <label for="meetpointCode1">Meetpoint Scheduler Code:</label>
                         <input type="text" id="meetpointCode1" placeholder="Meeting point identifier">
                     </div>
                     <div class="form-group">
-                        <label for="destination1">Meetpoint Address:</label>
-                        <input type="text" id="destination1" placeholder="Meeting point address">
+                        <label for="destination1">Destination Address:</label>
+                        <input type="text" id="destination1" placeholder="Ending address">
                     </div>
                     <div class="form-group">
                         <label for="duration1">Duration (minutes):</label>
@@ -337,23 +142,23 @@
                     <h2>Route 2</h2>
                     <div class="form-group">
                         <label for="location2">Origin Location Code:</label>
-                        <input type="text" id="location2" placeholder="e.g., CHI, 60601, Chicago" oninput="updateTimezone(2)">
+                        <input type="text" id="location2" placeholder="e.g., CHI, 60601, Chicago">
                     </div>
                     <div class="form-group">
                         <label for="address2">Origin Address:</label>
                         <input type="text" id="address2" placeholder="Starting address">
                     </div>
                     <div class="form-group">
-                        <label for="timezone2">Detected Timezone:</label>
-                        <input type="text" id="timezone2" placeholder="Enter location code above" readonly class="timezone-display">
+                        <label for="destLocation2">Destination Location Code:</label>
+                        <input type="text" id="destLocation2" placeholder="e.g., MIA, 33101, Miami">
                     </div>
                     <div class="form-group">
                         <label for="meetpointCode2">Meetpoint Scheduler Code:</label>
                         <input type="text" id="meetpointCode2" placeholder="Meeting point identifier">
                     </div>
                     <div class="form-group">
-                        <label for="destination2">Meetpoint Address:</label>
-                        <input type="text" id="destination2" placeholder="Meeting point address">
+                        <label for="destination2">Destination Address:</label>
+                        <input type="text" id="destination2" placeholder="Ending address">
                     </div>
                     <div class="form-group">
                         <label for="duration2">Duration (minutes):</label>
@@ -409,7 +214,6 @@
                     'colorado springs': 'America/Denver', 'omaha': 'America/Chicago', 'oklahoma city': 'America/Chicago',
                     'tulsa': 'America/Chicago'
                 };
-
                 this.zipCodeRanges = {
                     'America/New_York': [[10001, 14999], [6001, 6999], [7001, 8999], [19001, 19999], [20001, 20599], [21001, 21999], [22001, 24699], [27001, 28999], [29001, 29999], [30001, 31999], [32001, 34999], [1001, 5999]],
                     'America/Chicago': [[60001, 62999], [55001, 56799], [63001, 65999], [68001, 69999], [66001, 67999], [70001, 71599], [73001, 74999], [75001, 79999]],
@@ -417,20 +221,10 @@
                     'America/Los_Angeles': [[90001, 96199], [97001, 97999], [98001, 99499]],
                     'America/Phoenix': [[85001, 86999]]
                 };
-
-                this.timezoneNames = {
-                    'America/New_York': 'Eastern Time (EST/EDT)',
-                    'America/Chicago': 'Central Time (CST/CDT)',
-                    'America/Denver': 'Mountain Time (MST/MDT)',
-                    'America/Los_Angeles': 'Pacific Time (PST/PDT)',
-                    'America/Phoenix': 'Arizona Time (MST)'
-                };
             }
-
             detectTimezone(location) {
                 if (!location) return null;
                 const cleanLocation = location.toLowerCase().trim();
-                
                 const zipMatch = cleanLocation.match(/\b(\d{5})\b/);
                 if (zipMatch) {
                     const zipCode = parseInt(zipMatch[1]);
@@ -440,66 +234,51 @@
                         }
                     }
                 }
-
                 for (const [city, timezone] of Object.entries(this.timezoneMap)) {
                     if (cleanLocation.includes(city)) return timezone;
                 }
-
                 if (cleanLocation.includes('east') || cleanLocation.includes('atlantic')) return 'America/New_York';
                 else if (cleanLocation.includes('central') || cleanLocation.includes('midwest')) return 'America/Chicago';
                 else if (cleanLocation.includes('mountain') || cleanLocation.includes('rocky')) return 'America/Denver';
                 else if (cleanLocation.includes('west') || cleanLocation.includes('pacific')) return 'America/Los_Angeles';
-
                 return 'America/New_York';
             }
-
-            getTimezoneName(timezone) {
-                return this.timezoneNames[timezone] || timezone;
-            }
-
             getRouteData(routeNumber) {
                 const location = document.getElementById(`location${routeNumber}`).value.trim();
                 const address = document.getElementById(`address${routeNumber}`).value.trim();
+                const destLocation = document.getElementById(`destLocation${routeNumber}`).value.trim();
                 const meetpointCode = document.getElementById(`meetpointCode${routeNumber}`).value.trim();
                 const destination = document.getElementById(`destination${routeNumber}`).value.trim();
                 const duration = parseInt(document.getElementById(`duration${routeNumber}`).value);
                 const startTime = document.getElementById(`startTime${routeNumber}`).value;
-
-                if (!location || !address || !meetpointCode || !destination || !duration || !startTime) {
+                if (!location || !address || !destLocation || !meetpointCode || !destination || !duration || !startTime) {
                     throw new Error(`Please fill in all fields for Route ${routeNumber}`);
                 }
-
                 return {
-                    location, address, meetpointCode, destination, startTime, duration,
-                    originTimezone: this.detectTimezone(location)
+                    location, address, destLocation, meetpointCode, destination, startTime, duration,
+                    originTimezone: this.detectTimezone(location), destinationTimezone: this.detectTimezone(destLocation)
                 };
             }
-
             convertToUTC(timeString, timezone) {
                 const today = new Date();
                 const dateString = today.toISOString().split('T')[0];
                 const fullDateTime = `${dateString}T${timeString}:00`;
                 const localDate = new Date(fullDateTime);
-                
                 const timezoneOffsets = {
                     'America/New_York': -5 * 60, 'America/Chicago': -6 * 60, 'America/Denver': -7 * 60,
                     'America/Los_Angeles': -8 * 60, 'America/Phoenix': -7 * 60
                 };
-
                 const offsetMinutes = timezoneOffsets[timezone] || -5 * 60;
                 return new Date(localDate.getTime() - (offsetMinutes * 60000));
             }
-
             calculateArrivalTime(startTime, duration, timezone) {
                 const startUTC = this.convertToUTC(startTime, timezone);
                 return new Date(startUTC.getTime() + (duration * 60000));
             }
-
             levenshteinDistance(str1, str2) {
                 const matrix = [];
                 for (let i = 0; i <= str2.length; i++) matrix[i] = [i];
                 for (let j = 0; j <= str1.length; j++) matrix[0][j] = j;
-                
                 for (let i = 1; i <= str2.length; i++) {
                     for (let j = 1; j <= str1.length; j++) {
                         if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
@@ -511,7 +290,6 @@
                 }
                 return matrix[str2.length][str1.length];
             }
-
             calculateSimilarity(str1, str2) {
                 const longer = str1.length > str2.length ? str1 : str2;
                 const shorter = str1.length > str2.length ? str2 : str1;
@@ -519,86 +297,58 @@
                 const editDistance = this.levenshteinDistance(longer, shorter);
                 return (longer.length - editDistance) / longer.length;
             }
-
             checkConvergence(route1, route2) {
                 const arrival1 = this.calculateArrivalTime(route1.startTime, route1.duration, route1.originTimezone);
                 const arrival2 = this.calculateArrivalTime(route2.startTime, route2.duration, route2.originTimezone);
                 const timeDifference = Math.abs(arrival1.getTime() - arrival2.getTime()) / (1000 * 60);
-                
                 const destinationSimilarity = this.calculateSimilarity(route1.destination.toLowerCase(), route2.destination.toLowerCase());
                 const meetpointSimilarity = this.calculateSimilarity(route1.meetpointCode.toLowerCase(), route2.meetpointCode.toLowerCase());
-                
                 const timeThreshold = 15, similarityThreshold = 0.7;
                 const timeConverges = timeDifference <= timeThreshold;
                 const destinationConverges = destinationSimilarity >= similarityThreshold;
                 const meetpointMatches = meetpointSimilarity >= similarityThreshold;
-                
                 return {
                     converges: timeConverges && (destinationConverges || meetpointMatches),
                     timeDifference, destinationSimilarity, meetpointSimilarity,
                     arrival1, arrival2, timeConverges, destinationConverges, meetpointMatches
                 };
             }
-
             formatTime(date) {
                 return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
             }
-
             displayResult(analysis) {
                 const resultDiv = document.getElementById('result');
                 const resultClass = analysis.converges ? 'success' : 'error';
                 const resultText = analysis.converges ? '✅ Routes CONVERGE - Meeting point aligns!' : '❌ Routes DO NOT CONVERGE - No alignment detected';
-                
                 const details = `
                     <div class="details">
                         <h3>Analysis Details:</h3>
                         <p><strong>Route 1 Arrival:</strong> ${this.formatTime(analysis.arrival1)}</p>
                         <p><strong>Route 2 Arrival:</strong> ${this.formatTime(analysis.arrival2)}</p>
                         <p><strong>Time Difference:</strong> ${analysis.timeDifference.toFixed(1)} minutes</p>
-                        <p><strong>Meetpoint Address Similarity:</strong> ${(analysis.destinationSimilarity * 100).toFixed(1)}%</p>
+                        <p><strong>Destination Similarity:</strong> ${(analysis.destinationSimilarity * 100).toFixed(1)}%</p>
                         <p><strong>Meetpoint Code Similarity:</strong> ${(analysis.meetpointSimilarity * 100).toFixed(1)}%</p>
                         <p><strong>Time Convergence:</strong> ${analysis.timeConverges ? '✅ Yes' : '❌ No'} (within 15 min)</p>
                         <p><strong>Location Match:</strong> ${(analysis.destinationConverges || analysis.meetpointMatches) ? '✅ Yes' : '❌ No'} (70% threshold)</p>
                     </div>
                 `;
-                
                 resultDiv.className = `result ${resultClass} show`;
                 resultDiv.innerHTML = resultText + details;
             }
         }
-
         const tool = new RouteConvergenceTool();
-
-        function updateTimezone(routeNumber) {
-            const locationInput = document.getElementById(`location${routeNumber}`);
-            const timezoneDisplay = document.getElementById(`timezone${routeNumber}`);
-            
-            const location = locationInput.value.trim();
-            if (location) {
-                const timezone = tool.detectTimezone(location);
-                const timezoneName = tool.getTimezoneName(timezone);
-                timezoneDisplay.value = timezoneName;
-            } else {
-                timezoneDisplay.value = '';
-                timezoneDisplay.placeholder = 'Enter location code above';
-            }
-        }
-
         function checkConvergence() {
             const loadingDiv = document.getElementById('loading');
             const resultDiv = document.getElementById('result');
-            
             try {
                 loadingDiv.style.display = 'block';
                 resultDiv.className = 'result';
                 resultDiv.innerHTML = '';
-                
                 setTimeout(() => {
                     try {
                         const route1 = tool.getRouteData(1);
                         const route2 = tool.getRouteData(2);
                         const analysis = tool.checkConvergence(route1, route2);
-                        
                         loadingDiv.style.display = 'none';
                         tool.displayResult(analysis);
                     } catch (error) {
@@ -613,28 +363,19 @@
                 resultDiv.innerHTML = `❌ Error: ${error.message}`;
             }
         }
-
         function copyToClipboard(event) {
             if (event) event.stopPropagation();
             const url = window.location.href;
             navigator.clipboard.writeText(url).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                const originalText = btn.textContent;
-                btn.textContent = 'Copied!';
-                btn.style.background = '#4caf50';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '#2196f3';
-                }, 2000);
+                alert('URL copied to clipboard!');
             }).catch(() => {
-                alert('URL copied to clipboard: ' + url);
+                alert('URL: ' + url);
             });
         }
-
         document.addEventListener('DOMContentLoaded', function() {
-            const shareUrlElement = document.getElementById('shareUrl');
-            shareUrlElement.innerHTML = window.location.href + ' <button class="copy-btn" onclick="copyToClipboard(event)">Copy</button>';
+            document.getElementById('shareUrl').textContent = window.location.href;
         });
     </script>
 </body>
 </html>
+
